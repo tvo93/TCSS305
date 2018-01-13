@@ -1,0 +1,239 @@
+/*
+ * TCSS 305 Assignment 2 - Shopping Cart
+ */
+
+package tests;
+
+import static org.junit.Assert.*;
+
+import java.awt.Color;
+import java.math.BigDecimal;
+import model.Item;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * Test for the Item class.
+ * @author tvo93
+ * @version 1/20/2016
+ */
+public class ItemTest {
+    
+    /** The item name that will be used to test. */
+    private static final String NAME_ITEM = "Silly Putty";
+    
+    /** The bulk item quantity that will be used to test. */
+    private static final int BULK_QUANTITY = 6;
+   
+    
+    /** The item price that will be used to test. */
+    private final BigDecimal myPrice = new BigDecimal("4.41");
+       
+    /** The bulk price that will be used to test. */
+    private final BigDecimal myBulkPrice = new BigDecimal("10.04");
+    
+    /** Create an Item to test the class. */
+    private Item myItem;
+    
+    /**
+     * A method to initialize the test fixture before each test.
+     */
+    @Before
+    public void setUp() {
+        myItem = new Item(NAME_ITEM, myPrice, BULK_QUANTITY, myBulkPrice);
+    }
+    
+    /**
+     * Test method for constructor with 2 parameters.
+     */
+    @Test
+    public void testItemStringBigDecimal() {
+        myItem = new Item(NAME_ITEM, myPrice);
+    }
+
+    
+    /**
+     * Test of the copy constructor when the the item price is negative.
+     */
+    @Test(expected = IllegalArgumentException.class) 
+    public void testItemPriceNegative() {
+        new Item(NAME_ITEM, myItem.getPrice().negate(), 
+                 myItem.getBulkQuantity(), myItem.getBulkPrice());
+    }
+    
+    /**
+     * Test of the copy constructor when the the bulk quantity is negative.
+     */
+    @Test(expected = IllegalArgumentException.class) 
+    public void testBulkQuantityNegative() {
+        new Item(NAME_ITEM, myItem.getPrice(), -4, myItem.getBulkPrice());
+   
+    }
+    
+    /**
+     * Test of the copy constructor when the the bulk price is negative.
+     */
+    @Test(expected = IllegalArgumentException.class) 
+    public void testBulkPriceNegative() {
+        new Item(NAME_ITEM, myItem.getPrice(),  myItem.getBulkQuantity(), 
+                 myItem.getBulkPrice().negate());
+    }
+    
+    /**
+     * Test of the copy constructor when the the item is null.
+     */
+    @Test(expected = NullPointerException.class) 
+    public void testItemPriceNull() {
+        new Item(null, myItem.getPrice(),  myItem.getBulkQuantity(), myItem.getBulkPrice());
+    }
+    
+    /**
+     * Test method for {@link model.Item#hashCode()}.
+     */
+    @Test
+    public void testHashCode() {
+        final Item item1 = new Item(NAME_ITEM, myItem.getPrice(),  myItem.getBulkQuantity(), 
+                                    myItem.getBulkPrice());
+        assertEquals("Test hashCode method in the Item class", myItem.hashCode(), 
+                     item1.hashCode());
+    }
+
+
+ 
+    /**
+     * Test method for constructor with 4 parameters.
+     */
+    @Test
+    public void testItemStringBigDecimalIntBigDecimal() {
+        myItem = new Item(NAME_ITEM, myItem.getPrice(),  myItem.getBulkQuantity(), 
+                          myItem.getBulkPrice());
+    }
+
+    /**
+     * Test for bulk quality item.
+     */
+    @Test
+    public void testIsBulk() {
+        final Item item2 = new Item(NAME_ITEM, myItem.getPrice(),  myItem.getBulkQuantity(), 
+                                    myItem.getBulkPrice());
+        assertEquals("Test for bulk quantity item", item2.isBulk(), myItem.isBulk());
+    }
+    
+    
+    /**
+     * Test for not bulk quality item.
+     */
+    @Test
+    public void testNotIsBulk() {
+        final Item item3 = new Item(NAME_ITEM, myItem.getPrice(), 0, 
+                                    myItem.getBulkPrice());
+        assertNotEquals("Test for bulk quantity item", item3.isBulk(), myItem.isBulk());
+    }
+    
+    /**
+     * Test method for regular item.
+     */
+    @Test
+    public void testRegularToString() {
+        final Item item3 = new Item(NAME_ITEM, myItem.getPrice(), 0, 
+                                    myItem.getBulkPrice());     
+        assertEquals("toString() produced an unexpected result!",
+                     "Silly Putty, $4.41",
+                     item3.toString());
+        
+    }
+
+    /**
+     * Test method for bulk item.
+     */
+    @Test
+    public void testBulkToString() {
+        final Item item4 = new Item(NAME_ITEM, myItem.getPrice(),  myItem.getBulkQuantity(), 
+                                   myItem.getBulkPrice());
+        assertEquals("toString() produced an unexpected result!",
+                     "Silly Putty, $4.41 (6 for $10.04)",
+                     item4.toString());
+        
+    }
+    
+    /**
+     * Test method for reflexive equal.
+     */
+    @Test
+    public void testReflexive() {
+     // an object is equal to itself - reflexive property
+        assertEquals("equals() fails a test of the reflexive property.", myItem, myItem);
+    }
+    
+    /**
+     * Test method for not reflexive equal.
+     */
+    @Test
+    public void testNullObject() {
+        assertNotEquals("equals() fails a test of the reflexive property.", myItem, null);
+    }
+    
+    /**
+     * Test method for symmetric equal.
+     */
+    @Test
+    public void testSymmetric() {
+        final Item item = new Item(NAME_ITEM, myItem.getPrice(), myItem.getBulkQuantity(), 
+                                   myItem.getBulkPrice());
+        assertEquals("equals() fails a test of the symmetric property.",
+                     myItem, item);
+        assertEquals("equals() fails a test of the symmetric property.",
+                     item, myItem);
+    }
+    
+    /**
+     * Test method for wrong parameter.
+     */
+    @Test
+    public void testWrongParameter() {
+        assertNotEquals("equals() fails to return false when passed the wrong parameter type",
+                        myItem, new Color(5, 10, 30));
+    }
+    
+    
+    /**
+     * Test method for different item names.
+     */
+    @Test
+    public void testDifferentName() {
+        assertFalse("equals() fails to return false when item names do not match.",
+                    myItem.equals(new Item("Xbox One", myItem.getPrice(),
+                                           myItem.getBulkQuantity(), myItem.getBulkPrice())));
+    }
+    
+    /**
+     * Test method for different item prices.
+     */
+    @Test
+    public void testDifferentPrice() {
+        assertFalse("equals() fails to return false when item prices do not match.",
+                    myItem.equals(new Item(NAME_ITEM, new BigDecimal("1.11"), 
+                                           myItem.getBulkQuantity(), myItem.getBulkPrice())));
+    }
+    
+    /**
+     * Test method for different bulk quantities.
+     */
+    @Test
+    public void testDifferentBulkQuantity() {
+        assertFalse("equals() fails to return false when item prices do not match.",
+                    myItem.equals(new Item(NAME_ITEM, myItem.getPrice(), 
+                                           2, myItem.getBulkPrice())));
+    }
+    
+    /**
+     * Test method for different bulk prices.
+     */
+    @Test
+    public void testDifferentBulkPrice() {
+        assertFalse("equals() fails to return false when item prices do not match.",
+                    myItem.equals(new Item(NAME_ITEM, myItem.getPrice(), 
+                                      myItem.getBulkQuantity(), new BigDecimal("2.64"))));
+    }
+    
+}

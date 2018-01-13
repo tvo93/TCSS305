@@ -1,0 +1,300 @@
+/*
+    * TCSS 305 
+    * Assignment 6 - Tetris
+    */
+
+package view;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.Path2D;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
+
+import model.Board;
+import model.Point;
+import model.TetrisPiece;
+
+/**
+ * Preview next pieces.
+ * @author tvo93
+ * @version 3/4/2016
+ */
+public class PreviewPanel extends JPanel implements Observer  {
+    
+    /** A generated serialization ID. */
+    private static final long serialVersionUID = 1L;
+   
+    /**
+     * Size of blocks.
+     */
+    private static final int BLOCK_SIZE = 30;
+    
+    
+    /** The scale.*/
+    private static final int SCALE = 3;
+    
+    /**
+     * The width of default size of the preview panel(medium).
+     */
+    private static final int DEFAULT_PREVIEW_WIDTH = 300;
+    
+    /**
+     * The height of default size the preview panel(medium).
+     */
+    private static final int DEFAULT_PREVIEW_HEIGHT = 100;
+ 
+    /** Piece that is next to play. */
+    private TetrisPiece myNextPiece;
+  
+    /**
+     * The board panel.
+     */
+    private final TetrisBoardPanel myBoardPanel;
+    
+    /**
+     * Construct for the preview panel class.
+     * @param theBoardPanel the board panel
+     */
+    public PreviewPanel(final TetrisBoardPanel theBoardPanel) {
+        super();
+        setBackground(Color.BLACK);
+        setupBorder();
+        myBoardPanel = theBoardPanel;
+        setPreferredSize(new Dimension(DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT));
+    }
+
+    
+    /**
+     * Repaints the component with the specified graphics context.
+     * Draw the next pieces.
+     * @param theGraphics the graphic context
+     */
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);         
+        final Graphics2D g = (Graphics2D) theGraphics;
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+                               RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        Color color = null;
+        final int scale = 20;
+        drawMessage(g, getWidth() / scale);
+        // chose different color if color mode is choosen
+        if (myBoardPanel.isModeColor()) {
+            color = myBoardPanel.randomColor();
+        } else {
+            color = Color.green;
+        }
+        
+        if (myBoardPanel.isOval()) {
+            drawOvalShape(g, color);
+        } else if (myBoardPanel.isTri()) {
+            drawTriShape(g, color);
+        } else if (myBoardPanel.isRect()) {
+            drawRectShape(g, color);
+        } else if (myBoardPanel.isSmile()) {
+            drawSmileShape(g, color);
+        }
+    }
+    
+    /**
+     * Draw end game.
+     * @param theGraphics the graphics 
+     * @param theScale the scale
+     */
+    public void drawMessage(final Graphics2D theGraphics, 
+                             final int theScale) {
+        final Graphics2D g = theGraphics;
+        
+        final int scale1 = 3;
+        final int scale2 = 4;
+        final int scale3 = 20;
+     
+      
+        g.setStroke(new BasicStroke(2));
+        final Path2D.Double triangle = new Path2D.Double();
+        
+        for (int i = 0; i <= scale3 * scale2; i += 2 * scale3) {
+            
+            
+            triangle.moveTo(getWidth() / scale1 + i, 
+                        getHeight() / scale2 - scale3);
+            
+            triangle.lineTo(getWidth() / scale1 + i, 
+                         getHeight() / scale2);
+        
+            triangle.lineTo(getWidth() / scale1 + scale3 + i, 
+                        getHeight() / scale2 - scale3);
+            triangle.closePath();
+            g.draw(triangle);
+            g.setColor(Color.white.brighter());
+            g.fill(triangle);
+            
+            g.setStroke(new BasicStroke(scale1));
+            g.drawLine(getWidth() / scale1 + i, 
+                    getHeight() / scale2 - scale3,  getWidth() / scale1 + i , 
+                    getHeight() / scale2 + scale3);
+            //repaint();
+        }
+    }
+    
+    /**
+     * A method that displays blocks as rectangle shape.
+     * @param theGraphics the graphic
+     * @param theColor the color
+     */
+    public void drawRectShape(final Graphics2D theGraphics, final Color theColor) {
+        super.paintComponent(theGraphics);         
+        final Graphics2D g = (Graphics2D) theGraphics;
+        if (myNextPiece != null) {
+            for (int i = 0; i < myNextPiece.getPoints().length; i++) {          
+                final Point point = myNextPiece.getPoints()[i];      
+                g.setColor(theColor);
+                g.setStroke(new BasicStroke(2));
+                g.fillRoundRect(point.x() * BLOCK_SIZE + getWidth() / SCALE, 
+                          getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                          + SCALE * BLOCK_SIZE, BLOCK_SIZE, 
+                          BLOCK_SIZE, BLOCK_SIZE / 2, BLOCK_SIZE / 2);        
+               
+            }
+        }
+               
+    }
+    
+
+    /**
+     * Draw ellipse shape to display for next piece.
+     * @param theGraphics the graphics
+     * @param theColor the color 
+     */
+    public void drawOvalShape(final Graphics theGraphics, final Color theColor) {
+        super.paintComponent(theGraphics);         
+        final Graphics2D g = (Graphics2D) theGraphics;
+        if (myNextPiece != null) {
+            for (int i = 0; i < myNextPiece.getPoints().length; i++) {          
+                final Point point = myNextPiece.getPoints()[i];      
+                g.setColor(theColor);
+                g.fillOval(point.x() * BLOCK_SIZE + getWidth() / SCALE, 
+                          getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                          + SCALE * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);        
+               
+            }
+        }
+        
+    }
+    
+    /**
+     * Draw smile shape to display for next piece.
+     * @param theGraphics the graphics
+     * @param theColor the color 
+     */
+    public void drawSmileShape(final Graphics theGraphics, final Color theColor) {
+        super.paintComponent(theGraphics);         
+        final Graphics2D g = (Graphics2D) theGraphics;
+        
+      //local instance fields
+        final int scale1 = 3;
+        final int scale2 = 4;
+        final int scale3 = 5;
+        
+        if (myNextPiece != null) {
+            for (int i = 0; i < myNextPiece.getPoints().length; i++) {          
+                final Point point = myNextPiece.getPoints()[i];      
+                g.setColor(Color.red);
+                g.setStroke(new BasicStroke(2));
+                g.drawOval(point.x() * BLOCK_SIZE + getWidth() / SCALE, 
+                           getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                           + SCALE * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);  
+                
+                g.setColor(theColor);
+                g.fillOval(point.x() * BLOCK_SIZE + getWidth() / SCALE 
+                           + scale1 * BLOCK_SIZE / (scale2 * scale3), 
+                           getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                           + SCALE * BLOCK_SIZE + BLOCK_SIZE / scale2,
+                           BLOCK_SIZE / scale3,  BLOCK_SIZE / scale3);
+                
+                g.fillOval(point.x() * BLOCK_SIZE + getWidth() / SCALE 
+                           + (scale3 * 2 + scale1) * BLOCK_SIZE / (scale2 * scale3),
+                           getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                           + SCALE * BLOCK_SIZE + BLOCK_SIZE / scale2,
+                           BLOCK_SIZE / scale3,  BLOCK_SIZE / scale3);
+                
+
+                g.drawArc(point.x() * BLOCK_SIZE + getWidth() / SCALE 
+                          + BLOCK_SIZE / scale2, 
+                          getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                          + SCALE * BLOCK_SIZE + BLOCK_SIZE / scale1,
+                          BLOCK_SIZE / 2,  BLOCK_SIZE / 2,
+                    scale1 * scale1 * scale2 * scale3, scale1 * scale1 * scale2 * scale3);
+                repaint();        
+               
+            }
+        }
+        
+    }
+   
+    
+    /**
+     * Draw triangle shape to display for next piece.
+     * @param theGraphics the graphics
+     * @param theColor the color 
+     */
+    public void drawTriShape(final Graphics theGraphics, final Color theColor) {
+        super.paintComponent(theGraphics);         
+        final Graphics2D g = (Graphics2D) theGraphics;
+        if (myNextPiece != null) {
+            for (int i = 0; i < myNextPiece.getPoints().length; i++) {          
+                final Point point = myNextPiece.getPoints()[i];      
+                g.setColor(theColor);
+               
+                final Path2D.Double triangle = new Path2D.Double();
+                triangle.moveTo(point.x() * BLOCK_SIZE + getWidth() / SCALE + BLOCK_SIZE / 2,  
+                                getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                                + SCALE * BLOCK_SIZE);
+                
+                triangle.lineTo(point.x() * BLOCK_SIZE + getWidth() / SCALE,
+                                getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                                + SCALE * BLOCK_SIZE + BLOCK_SIZE);
+                
+                triangle.lineTo(point.x() * BLOCK_SIZE + getWidth() / SCALE + BLOCK_SIZE,
+                                getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                                + SCALE * BLOCK_SIZE + BLOCK_SIZE);
+                triangle.closePath();
+                g.fill(triangle);
+                
+                  
+               
+            }
+        }
+        
+    }
+    
+    /**
+     * This method creates a border for the panel.
+     */
+    private void setupBorder() {
+        final TitledBorder title = new TitledBorder("Next Piece");
+        title.setTitleColor(Color.RED);
+        title.setTitleJustification(TitledBorder.CENTER);
+        setBorder(title);
+    }
+    
+    @Override
+    public void update(final Observable theObservable, final Object theData) {
+        
+        if (theObservable instanceof Board && theData instanceof TetrisPiece) {
+            myNextPiece = (TetrisPiece) theData;
+        }
+
+        repaint();
+    }
+    
+
+}

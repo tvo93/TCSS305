@@ -1,0 +1,248 @@
+/*
+    * TCSS 305 
+    * Assignment 6 - Tetris
+    */
+
+package view;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
+
+/**
+ * A class that creates menu bar for the frame.
+ * @author tvo93
+ * @version 2/26/2016
+ */
+public class MenuBar extends JMenuBar {
+
+    /** A generated serialization ID. */
+    private static final long serialVersionUID = 1L;
+    
+    /**
+     * A menu item for new game.
+     */
+    private final JMenuItem myNewGame = new JMenuItem("New Game");
+    
+    /**
+     * A menu item for end game.
+     */
+    private final JMenuItem myEndGame = new JMenuItem("End Game");
+    
+    
+    /** A file menu for the frame. */
+  // private final JMenu myHelpMenu = new JMenu("Help");
+    
+    /**
+     * Boar panel.
+     */
+    private final TetrisBoardPanel myBoardPanel;
+    
+    /**
+     * Constructs for the menu bar.
+     * @param theFrame the JFrame
+     * @param theBoardPanel the Board Panel
+     */
+    public MenuBar(final JFrame theFrame, final TetrisBoardPanel theBoardPanel) {
+        super();
+        
+        myBoardPanel = theBoardPanel;
+        add(createFileMenu(theFrame));
+        add(createOptionMenu());
+        add(createHelpMenu());
+    }
+    
+    /**
+     * Create file menu.
+     * @return file menu
+     * @param theFrame the frame
+     */
+    public JMenu createFileMenu(final JFrame theFrame) {
+
+        // set up quit option
+        final JMenuItem quitButton = new JMenuItem("Quit");
+        quitButton.setMnemonic(KeyEvent.VK_Q);
+        quitButton.setAccelerator(KeyStroke.getKeyStroke('Q', KeyEvent.CTRL_MASK));
+        quitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                theFrame.dispatchEvent(new WindowEvent(theFrame,
+                                                       WindowEvent.WINDOW_CLOSING));
+            }
+        });
+        
+        // Add menu items in file menu
+        final JMenu menuFile = new JMenu("File");
+        menuFile.setForeground(Color.GREEN);
+        
+        // set mnemonic to menu items
+        menuFile.setMnemonic(KeyEvent.VK_F);
+        myNewGame.setMnemonic(KeyEvent.VK_N);
+        myEndGame.setMnemonic(KeyEvent.VK_E);
+        
+        // add menu items to menu file
+        menuFile.add(myNewGame);
+        menuFile.addSeparator();
+        menuFile.add(myEndGame);
+        menuFile.addSeparator();
+        menuFile.add(quitButton);
+        
+        // set color for background and foreground 
+        for (final Component c : menuFile.getMenuComponents()) {
+            setBackForeGround(c);
+        }    
+        // get all file menu item here
+        return menuFile;      
+    }
+    
+    /**
+     * Create help menu.
+     * @return help menu
+     */
+    public final JMenu createHelpMenu() {
+        // create help menu
+        final JMenu helpMenu = new JMenu("Help");
+        helpMenu.setForeground(Color.GREEN);
+        helpMenu.setMnemonic(KeyEvent.VK_H);
+       
+        // about menu item
+        final JMenuItem about = new JMenuItem("About...");
+        about.setMnemonic(KeyEvent.VK_A);
+        about.setAccelerator(KeyStroke.getKeyStroke('A', KeyEvent.CTRL_MASK));
+        final ImageIcon icon = new ImageIcon("label.png");
+        about.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                JOptionPane.showMessageDialog(myBoardPanel, gameInstructions(), 
+                                              "About", JOptionPane.OK_OPTION, icon);
+            }  
+        });
+        
+        helpMenu.add(about);
+        // set color for background and foreground 
+        for (final Component c : helpMenu.getMenuComponents()) {
+            setBackForeGround(c);
+        }    
+        return helpMenu;
+    }
+    
+    /**
+     * Create options menu.
+     * @return option menu
+     */
+    public final JMenu createOptionMenu() {
+        // create option menu
+        final JMenu optionMenu = new JMenu("Options");
+        optionMenu.setForeground(Color.GREEN);
+        optionMenu.setMnemonic(KeyEvent.VK_O);
+        
+        // create group buttons
+        final ButtonGroup group = new ButtonGroup();
+        
+        // add radio buttons
+        final JRadioButtonMenuItem small = new JRadioButtonMenuItem("Small");   
+        final JRadioButtonMenuItem medium = new JRadioButtonMenuItem("Medium");   
+        final JRadioButtonMenuItem large = new JRadioButtonMenuItem("Large");
+        
+        // default size selected
+        medium.setSelected(true);
+        
+        // add action listener for radio buttons
+        small.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                firePropertyChange("small", null, null);
+            }
+        });
+        medium.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                firePropertyChange("medium", null, null);
+            }
+        });
+        
+        large.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                firePropertyChange("large", null, null);
+            }
+        });
+        
+        // create JMenu button
+        final JMenu size = new JMenu("Size");
+        size.setMnemonic(KeyEvent.VK_S);
+        size.setOpaque(true);
+   
+        // add radio buttons to group button
+        group.add(small);
+        group.add(medium);
+        group.add(large);
+        
+        // add radio buttons to size menu 
+        size.add(small);
+        size.add(medium);
+        size.add(large);
+        
+       
+        optionMenu.add(size);
+       
+        // set color for background and foreground 
+        for (final Component c : size.getMenuComponents()) {
+            setBackForeGround(c);
+        }        
+        for (final Component c : optionMenu.getMenuComponents()) {
+            setBackForeGround(c);
+        }
+       
+        return optionMenu;
+    }
+    /**
+     * Create game instruction by using string builder.
+     * @return string builder message
+     */
+    public String gameInstructions() {
+        final StringBuilder str = new StringBuilder(400);
+        str.append(" Wellcome to Tetris game \n"
+                        + "How to play?\n"
+                        + "Press LEFT key to move left.\n"
+                        + "Press RIGHT key to move right.\n"
+                        + "Press DOWN key to move down 1 step.\n"
+                        + "Press A arrow key to rotate clock wise.\n"
+                        + "Press D arrow key to rotate counter clock wise.\n"
+                        + "Press SPACE key to make a hard drop quickly.\n"
+                        + "Press P key to pause the game.\n"
+                        + "Press R key to resume the game.\n"
+                        + "        ~~~~GOOD LUCK~~~~");
+        return str.toString();
+    }
+    
+    /**
+     * Set color for background and foreground.
+     * @param theC the component
+     */
+    public void setBackForeGround(final Component theC) {
+        theC.setBackground(Color.BLACK);
+        theC.setForeground(Color.green);
+    }
+    
+   
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}

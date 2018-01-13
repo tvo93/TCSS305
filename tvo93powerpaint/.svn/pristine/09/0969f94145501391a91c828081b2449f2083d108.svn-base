@@ -1,0 +1,289 @@
+/*
+ * TCSS 305
+ * Assignment 5 - PowerPaint
+ */
+
+package gui;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JPanel;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.MouseInputListener;
+
+import tools.Pencil;
+import tools.ShapeTools;
+
+/**
+ * Panel displays the painting in the GUI.
+ * @author tvo93
+ * @version 2/12/2016
+ */
+public class PowerPaintPanel extends JPanel {
+
+    /**
+     * The minimum size for this JPanel.
+     */
+    private static final Dimension DEFAULT_SIZE = new Dimension(500, 400);
+   
+    /** A generated serialization ID. */
+    private static final long serialVersionUID = 7873071423586547461L;
+    
+    /**
+     * The Red Color value.
+     */
+    private static final int RED_VALUE = 51;
+    
+    /**
+     * The Green Color value.
+     */
+    private static final int GREEN_VALUE = 0;
+    
+    /**
+     * The blue Color value.
+     */
+    private static final int BLUE_COLOR = 111;
+   
+    /**
+     * Stroke value.
+     */
+    private static final float STROKE_VALUE = 5f;
+    /**
+     * Set the stroke.
+     */
+    private float myStroke = STROKE_VALUE;
+     
+    
+         
+     /** The color. */
+    private Color myColor;
+     
+     /**
+      * The tools.
+      */
+    private ShapeTools myShapeTools;
+     
+     /**
+      * The shape list.
+      */
+    private List<PowerPaintShapes> myShapeList =  new ArrayList<>();
+     
+     /**
+      * Count number.
+      */
+    private int myCount;
+     
+     /**
+      * Shapes.
+      */
+    private Shape myShape;
+     /**
+      * Determines the previous shape.
+      */
+    private boolean myShapeCheck;
+  
+   
+   
+    /**
+    * Constructs the panel.
+    */
+    public PowerPaintPanel() {
+        super(); 
+        
+        // set up pencil as default tool
+        myShapeTools = new Pencil(); 
+        myShapeCheck = true;
+        myCount = 0;
+        
+        // set up default color as UW purple
+        myColor =  new Color(RED_VALUE, GREEN_VALUE, BLUE_COLOR);
+        setPreferredSize(DEFAULT_SIZE);
+        setBackground(Color.WHITE);
+        
+        // mouse listener
+        final MouseInputAdapter mouse = new MouseActionTracker();
+        addMouseListener(mouse);
+        addMouseMotionListener(mouse);
+    }
+
+
+    /**
+     * Paints this panel on the screen with the specified Graphics object.
+     * 
+     * @param theGraphics The Graphics object.
+     */
+    @Override
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g = (Graphics2D) theGraphics; 
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
+      
+
+        setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+
+       
+        // Display drawShape method here
+        drawShapes(g);  
+    }
+    
+    /**
+     * Set up shape tool for the program.
+     * @param theShapeTools the shape tools
+     */
+    public void setShapeTools(final ShapeTools theShapeTools) {
+        myShapeTools = theShapeTools;
+    }
+    /**
+     * Set the stroke.
+     * @param theStroke the stroke
+     */
+    public void setStroke(final int theStroke) {
+        myStroke = theStroke;
+        repaint();
+    }
+    
+   
+    /**
+     * Get stroke.
+     * @return stroke value
+     */
+    public float getStroke() {
+        return myStroke;
+    }
+    
+    /**
+     * Display the start shape.
+     * @param theShape the shape
+     */
+    public void startShape(final Shape theShape) {
+        myShape = theShape;
+        myShapeCheck = false; // there is no previous shape
+    }
+    
+    /**
+     * display the end shape.
+     * 
+     * @param theShape the shape
+     */
+    public void endShape(final Shape theShape) {
+     //delete all the shapes after this index
+        for (int i = myCount; i < myShapeList.size() - 1; i++) {
+            myShapeList.remove(i);
+            
+        }
+        myShapeList.add(new PowerPaintShapes(theShape, myColor, myStroke));
+        myShapeCheck = true;
+        myCount++;
+    }
+    
+    
+    
+    /**
+     * Clear all shapes.
+     */
+    public void removeShape() {
+        myShapeList = new ArrayList<>();  
+        myCount = 0;           
+    }
+    
+    /**
+     * Draw the shapes depending on which shape is selected.
+     * @param theGraphics  the graphics
+     */
+    public void drawShapes(final Graphics2D theGraphics) {
+        
+        final Graphics2D g = (Graphics2D) theGraphics;
+        for (int i = 0; i <= myCount - 1; i++) {
+            
+            // get each color depending on chooser
+            final Color shapeColor = myShapeList.get(i).getColor();
+            g.setColor(shapeColor);
+            
+            // get stroke value depending on chooser 
+            final Stroke shapeStroke = new BasicStroke(myShapeList.get(i).getStroke());
+            g.setStroke(shapeStroke); 
+           
+            // get shape depending on chooser
+            final Shape shape = myShapeList.get(i).getShape();
+            g.draw(shape); 
+        }
+        
+        if (getStroke() > 0 && !myShapeCheck) {      
+            g.setStroke(new BasicStroke(myStroke));
+            g.setColor(myColor);
+            g.draw(myShape); 
+        }
+    }
+    
+ 
+    
+    /**
+     * Get color.
+     * @return the color
+     */
+    public Color getColor() {    
+        return myColor;
+    }
+    
+    /**
+     * Set color.
+     * @param theColor the color
+     * @throws IllegalArgumentException if the color is null
+     */
+    public void setColor(final Color theColor) throws IllegalArgumentException {
+        if (theColor == null) {
+            throw new IllegalArgumentException("Color cannot be null.");
+        }
+        myColor = theColor;
+    }
+    
+    /**
+     * Mouse action that is used to draw different shapes by mouse.
+     * @author tvo93
+     * @version 2/21/2016
+     */
+    private class MouseActionTracker extends MouseInputAdapter implements MouseInputListener {
+        
+        @Override
+        public void mousePressed(final MouseEvent theEvent) {
+            startShape(myShapeTools.setStartPoint(theEvent.getPoint()));    
+          
+            myShapeCheck = true; 
+           
+        }
+        
+     
+        @Override
+        public void mouseReleased(final MouseEvent theEvent) { 
+           
+            if (getStroke() > 0) {
+                endShape(myShape);
+            }
+            myShape = myShapeTools.setStartPoint(new Point(0, 0));
+            myShapeCheck = false;
+            
+        }
+       
+        @Override
+        public void mouseDragged(final MouseEvent theEvent) {
+            startShape(myShapeTools.setEndPoint(theEvent.getPoint()));
+            repaint();
+        }
+    
+    }
+  
+}
+   

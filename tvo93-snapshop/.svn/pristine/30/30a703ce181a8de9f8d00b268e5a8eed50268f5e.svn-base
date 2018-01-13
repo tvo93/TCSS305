@@ -1,0 +1,299 @@
+/*
+ * TCSS 305 - SnapShop
+ */
+
+
+package gui;
+
+
+import filters.EdgeDetectFilter;
+import filters.EdgeHighlightFilter;
+import filters.Filter;
+import filters.FlipHorizontalFilter;
+import filters.FlipVerticalFilter;
+import filters.GrayscaleFilter;
+import filters.SharpenFilter;
+import filters.SoftenFilter;
+import image.PixelImage;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+
+
+/**
+ * The graphical user interface for the SnapShop program.
+ * @author tvo93
+ * @version 1/31/2016
+ */
+public class SnapShopGUI extends JFrame {
+    
+  
+    
+    /** A generated Serialization ID. */
+    private static final long serialVersionUID = 1L;
+
+    // constants to capture screen dimensions
+    /** A ToolKit. */
+    private static final Toolkit KIT = Toolkit.getDefaultToolkit();
+
+    /** The Dimension of the screen. */
+    private static final Dimension SCREEN_SIZE = KIT.getScreenSize();
+
+    /** The width of the screen. */
+    private static final int SCREEN_WIDTH = SCREEN_SIZE.width;
+
+    /** The height of the screen. */
+    private static final int SCREEN_HEIGHT = SCREEN_SIZE.height;
+    
+    
+    /**
+     * Main panel for the GUI.
+     */
+    private final JPanel myMasterPanel = new JPanel(new BorderLayout());
+    /**
+     *  The Save button.
+     */
+    private final JButton mySave = new JButton("Save As...");
+   
+    /**
+     * The close button.
+     */
+    private final JButton myClose = new JButton("Close Image");
+    
+    /**
+     * The panel for all filter buttons.
+     */
+    private final JPanel myWestPanel = new JPanel();
+    /**
+     * The label (image).
+     */
+    private final JLabel myLabel = new JLabel();
+   
+    /**
+     * The Image.
+     */
+    private PixelImage myImage;
+    
+    /**
+     * File chooser for opening and saving files.
+     */
+    private final JFileChooser myChooser = new JFileChooser();
+    /**
+     * Constructs a new SnapShopGUI.
+     */
+    public SnapShopGUI() {
+        super("TCSS 305 SnapShop");   
+    }
+    
+    /**
+     * Start the program.
+     */
+    public void start() {
+        
+        setUpGUI();
+     
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocation(SCREEN_WIDTH / 2 - getWidth() / 2, SCREEN_HEIGHT / 2 - getHeight() / 2);
+       
+        setVisible(true);
+        setResizable(true);
+        pack();
+    }
+    
+    /**
+     * Set up the outlook of GUI.
+     */
+    public void setUpGUI() {
+        
+        
+        filterEffects();
+        final JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.add(myLabel);
+        
+        final JButton openB = new JButton("Open");
+        final JPanel southPanel = new JPanel(new FlowLayout());
+        southPanel.add(openB);
+        southPanel.add(mySave);
+        southPanel.add(myClose);
+        
+        openB.addActionListener(new OpenListener());
+        mySave.addActionListener(new SaveListener());
+        myClose.addActionListener(new CloseListener());
+        
+        final GridLayout gb = new GridLayout(7, 1);
+        myWestPanel.setLayout(gb);
+        
+      
+        myMasterPanel.add(myWestPanel, BorderLayout.WEST);
+        myMasterPanel.add(southPanel, BorderLayout.SOUTH);
+        myMasterPanel.add(centerPanel, BorderLayout.CENTER);
+        
+        add(myMasterPanel);
+        displayOptions(false);
+    }
+    
+    
+    /**
+     * Call all filer effects.
+     */
+    private void filterEffects() {
+        filterEffectsButtons(new EdgeDetectFilter());
+        filterEffectsButtons(new EdgeHighlightFilter());
+        filterEffectsButtons(new FlipHorizontalFilter());
+        filterEffectsButtons(new FlipVerticalFilter());
+        filterEffectsButtons(new GrayscaleFilter());
+        filterEffectsButtons(new SharpenFilter());
+        filterEffectsButtons(new SoftenFilter());      
+    }
+    
+    
+    /**
+     * A method that disable or enable buttons.
+     * @param theIsEnabled is true when all the buttons are enable.
+     */
+    private void displayOptions(final boolean theIsEnabled) {
+        final Component[] display = myWestPanel.getComponents();
+        if (theIsEnabled) {
+            for (int i = 0; i < display.length; i++) {
+                display[i].setEnabled(true);
+            }
+            // enable buttons
+            mySave.setEnabled(true);
+            myClose.setEnabled(true);
+           
+        } else {  
+               
+            for (int i = 0; i < display.length; i++) {
+                display[i].setEnabled(false);
+            }
+            // disable buttons
+            mySave.setEnabled(false);
+            myClose.setEnabled(false);
+          
+        }   
+    }
+    
+    /**
+     * A method that creates all filter buttons 
+     * and do their effects if the users click on
+     * after loading an image.
+     * @param theFilter specific the button filters
+     */
+    private void filterEffectsButtons(final Filter theFilter) {
+        // create all buttons
+        final JButton filterButton = new JButton(theFilter.getDescription());
+        // add listener for each button
+        filterButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                theFilter.filter(myImage); // filter effects image  
+             // result after clicking on filter buttons
+                myLabel.setIcon(new ImageIcon(myImage)); 
+            }
+        });
+        myWestPanel.add(filterButton); // locate button on panel    
+    }
+    
+    /**
+     * An action listener that shows the open dialog 
+     * when the users click on Open button.
+     * @author tvo93
+     * @version 31 October 2015
+     */
+    private class OpenListener implements ActionListener { 
+         
+         /**
+          * A method that allows users to select an image to open.
+          * @param theOpenEvent the Event
+          */
+        public void actionPerformed(final ActionEvent theOpenEvent) {
+            final int result = myChooser.showOpenDialog(myMasterPanel);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                try {
+                    myImage = PixelImage.load(myChooser.getSelectedFile());
+                    myLabel.setIcon(new ImageIcon(myImage));
+         
+                    displayOptions(true);
+                    pack();
+                   
+                     
+                } catch (final IOException e) {
+                    JOptionPane.showMessageDialog(null, 
+                                  "The selected file did not contain an image!",
+                                  "Error!", 0);               
+                }                   
+            }        
+        }
+    }
+    
+    /** An action listener that shows the save dialog
+     * when the users click on the save as button.
+     * @author tvo93
+     * @version 31 October 2015
+     */
+    private  class SaveListener implements ActionListener {
+        
+       /**
+        * A method thats allows users to select the memory to save.
+        * @param theSaveEvent the Event.
+        */
+        public void actionPerformed(final ActionEvent theSaveEvent) {
+            final int result = myChooser.showSaveDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                try {
+                    myImage.save(myChooser.getSelectedFile());  
+                    myLabel.setIcon(new ImageIcon(myImage));
+                    displayOptions(true);
+                    pack();
+                
+                } catch (final IOException e) {
+                    JOptionPane.showMessageDialog(null, 
+                                        "No file saved!");                       
+                }          
+            }     
+        }
+    }
+    
+    
+    /** 
+     * An action listener that removes an current image
+     * when the user clicks on close image button.
+     * @author tvo93
+     * @version 31 October 2015
+     */
+    private class CloseListener implements ActionListener {
+        
+        /**
+         * A method that removes the image and resizes
+         * the screen to the beginning.
+         * @param theCloseEvent the event. 
+         */
+        public void actionPerformed(final ActionEvent theCloseEvent) {
+            myLabel.setIcon(null); // set no image to display
+            displayOptions(false); // go back to display screen at the beginning
+           
+            pack();
+            
+        }
+    }
+   
+    
+    
+}

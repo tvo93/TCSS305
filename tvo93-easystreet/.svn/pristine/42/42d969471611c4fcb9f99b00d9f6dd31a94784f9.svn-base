@@ -1,0 +1,131 @@
+/**
+ * 
+ */
+package tests;
+
+import static org.junit.Assert.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import model.Direction;
+import model.Light;
+import model.Terrain;
+import model.Truck;
+
+/**
+ * Unit Test for class truck.
+ * @author tvo93
+ * @version 1/28/2016
+ *
+ */
+public class TruckTest {
+    /**
+     * Truck vehicle.
+     */
+    private Truck myTruck;
+    
+    /**
+     * The x coordinate.
+     */
+    private static final int MY_X = 1;
+    
+    /**
+     * The y coordinate.
+     */
+    private static final int MY_Y = 1;
+    
+    /**
+     * The direction.
+     */
+  //  private final Direction myDirection = Direction.SOUTH;
+   // private final Terrain myTerrain = new Terrain();
+    /**
+     *
+     */
+    @Before
+    public void setUp() {
+        myTruck = new Truck(1, 1, Direction.SOUTH);
+    }
+
+   
+    /**
+     * Test constructor.
+     */
+    @Test
+    public void testTruckConstructor() {
+        assertEquals("Truck x coordinate not initialized correctly!", 1, myTruck.getX());
+        assertEquals("Truck y coordinate not initialized correctly!", 1, myTruck.getY());
+        assertEquals("Truck direction not initialized correctly!", 
+                     Direction.SOUTH, myTruck.getDirection());
+        assertEquals("Truck death time not initialized correctly!", 0, myTruck.getDeathTime());
+        
+    }
+    
+    /**
+     * Test method for canPass method.
+     */
+    @Test
+    public void testCanPass() {
+        
+        for (final Terrain t : Terrain.values()) {
+            for (final Light l : Light.values()) {
+           // truck pass on street and light only
+              // ignore lights
+                if (t == Terrain.STREET || t == Terrain.LIGHT) {
+                    assertTrue("Trucks can pass " + t, 
+                         myTruck.canPass(t, l));
+                } else {
+                    assertFalse("Trucks can not pass" + t, 
+                          myTruck.canPass(t, l));
+                }
+            }
+        }
+    }
+
+    /**
+     * Test method for {@link Truck#chooseDirection(java.util.Map, Light)}.
+     */
+    @Test
+    public void testChooseDirection() {
+        final Map<Direction, Terrain> neighbors = new HashMap<Direction, Terrain>();
+        for (final Terrain t1 : Terrain.values()) {
+            for (final Terrain t2 : Terrain.values()) {
+                for (final Terrain t3 : Terrain.values()) {
+                    for (final Terrain t4 : Terrain.values()) {
+                        neighbors.put(myTruck.getDirection(), t1);
+                        neighbors.put(myTruck.getDirection().left(), t2); 
+                        neighbors.put(myTruck.getDirection().right(), t3); 
+                        neighbors.put(myTruck.getDirection().reverse(),  t4); 
+                        if (!hasAdjacentStreetOrLight(neighbors)) {
+                            assertNotSame(myTruck.getDirection().reverse(), 
+                                          myTruck.chooseDirection(neighbors));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * Returns true if there are any adjacent streets or lights.
+     * @param the_neighbors All of the adjacent squares of this vehicle.
+     * @return If there are any adjacent streets or lights.
+     */
+    private boolean hasAdjacentStreetOrLight(final Map<Direction, Terrain> the_neighbors) {
+      boolean has_street_or_light = false; 
+      if ((the_neighbors.get(myTruck.getDirection()) == Terrain.STREET 
+          || the_neighbors.get(myTruck.getDirection()) == Terrain.LIGHT)
+          || (the_neighbors.get(myTruck.getDirection().left()) == Terrain.STREET 
+          || the_neighbors.get(myTruck.getDirection().left()) == Terrain.LIGHT)
+          || (the_neighbors.get(myTruck.getDirection().right()) == Terrain.STREET 
+          || the_neighbors.get(myTruck.getDirection().right()) == Terrain.LIGHT)) {
+        has_street_or_light = true;
+      }
+      return has_street_or_light;
+    }
+    
+
+}

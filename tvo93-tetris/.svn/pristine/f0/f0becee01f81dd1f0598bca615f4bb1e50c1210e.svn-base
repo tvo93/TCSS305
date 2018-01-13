@@ -1,0 +1,352 @@
+/*
+    * TCSS 305 
+    * Assignment 6 - Tetris
+    */
+
+package view;
+
+import action.KeyAction;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
+import javax.swing.Timer;
+
+
+import model.Board;
+
+/**
+ * A class that creates menu bar for the frame.
+ * @author tvo93
+ * @version 2/26/2016
+ */
+public class MenuBar extends JMenuBar {
+
+    /** A generated serialization ID. */
+    private static final long serialVersionUID = 1L;
+    
+    /**
+     * A menu item for new game.
+     */
+    private final JMenuItem myNewGame = new JMenuItem("New Game");
+    
+    /**
+     * A menu item for end game.
+     */
+    private final JMenuItem myEndGame = new JMenuItem("End Game");
+    
+    /**
+     * UW color.
+     */
+    private final Color myMenuUWColor =  new Color(51, 0, 111);
+    
+  
+    /**
+     * Board panel.
+     */
+    private final TetrisBoardPanel myBoardPanel;
+    
+    /**
+     * The Key Listener.
+     */
+    private final KeyAction myKey;
+    
+    /** 
+     * A board.
+     */
+    private final Board myBoard;
+    
+    /** The timer that controls the movement of blocks. */
+    private final Timer myMoveTimer;
+    
+    /**
+     * Constructs for the menu bar.
+     * @param theFrame the JFrame
+     * @param theBoardPanel the Board Panel
+     * @param theBoard the Board
+     * @param theTimer the timer
+     * @param theKey the key listener
+     */
+    public MenuBar(final JFrame theFrame, final TetrisBoardPanel theBoardPanel
+                   , final Board theBoard, final Timer theTimer, final KeyAction theKey) {
+        super();
+        
+        myBoardPanel = theBoardPanel;
+        myBoard = theBoard;
+        myMoveTimer = theTimer;
+        myKey = theKey;
+        add(createFileMenu(theFrame));
+        add(createOptionMenu());
+        add(createHelpMenu());
+    }
+    
+    /**
+     * Create file menu.
+     * @return file menu
+     * @param theFrame the frame
+     */
+    public JMenu createFileMenu(final JFrame theFrame) {
+
+        // set up quit option
+        final JMenuItem quitButton = new JMenuItem("Quit");
+        quitButton.setMnemonic(KeyEvent.VK_Q);
+        quitButton.setAccelerator(KeyStroke.getKeyStroke('Q', KeyEvent.CTRL_MASK));
+        quitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                theFrame.dispatchEvent(new WindowEvent(theFrame,
+                                                       WindowEvent.WINDOW_CLOSING));
+            }
+        });
+        
+        // Add menu items in file menu
+        final JMenu menuFile = new JMenu("File");
+        menuFile.setForeground(myMenuUWColor);
+        
+        // set mnemonic to menu items
+        menuFile.setMnemonic(KeyEvent.VK_F);
+        myNewGame.setMnemonic(KeyEvent.VK_N);
+        myEndGame.setMnemonic(KeyEvent.VK_E);
+        
+        // add menu items to menu file
+        menuFile.add(newGameMenuItem());
+        menuFile.addSeparator();
+        menuFile.add(endGameMenuItem());
+        menuFile.addSeparator();
+        menuFile.add(quitButton);
+        
+        // set color for background and foreground 
+        for (final Component c : menuFile.getMenuComponents()) {
+            setBackForeGround(c);
+        }    
+        // get all file menu item here
+        return menuFile;      
+    }
+    
+    /**
+     * Create help menu.
+     * @return help menu
+     */
+    public final JMenu createHelpMenu() {
+        // create help menu
+        final JMenu helpMenu = new JMenu("Help");
+        helpMenu.setForeground(myMenuUWColor);
+        helpMenu.setMnemonic(KeyEvent.VK_H);
+       
+        // about menu item
+        final JMenuItem about = new JMenuItem("About...");
+        about.setMnemonic(KeyEvent.VK_A);
+        about.setAccelerator(KeyStroke.getKeyStroke('A', KeyEvent.CTRL_MASK));
+        final ImageIcon icon = new ImageIcon("label.png");
+        about.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                JOptionPane.showMessageDialog(myBoardPanel, gameInstructions(), 
+                                              "About", JOptionPane.OK_OPTION, icon);
+            }  
+        });
+        
+        helpMenu.add(about);
+        // set color for background and foreground 
+        for (final Component c : helpMenu.getMenuComponents()) {
+            setBackForeGround(c);
+        }    
+        return helpMenu;
+    }
+    
+    /**
+     * Create options menu.
+     * @return option menu
+     */
+    public final JMenu createOptionMenu() {
+        // create option menu
+        final JMenu optionMenu = new JMenu("Options");
+        optionMenu.setForeground(myMenuUWColor);
+        optionMenu.setMnemonic(KeyEvent.VK_O);
+        
+        // create group buttons
+        final ButtonGroup group = new ButtonGroup();
+        
+        // add radio buttons
+        final JRadioButtonMenuItem small = new JRadioButtonMenuItem("Small");   
+        final JRadioButtonMenuItem medium = new JRadioButtonMenuItem("Medium");   
+        final JRadioButtonMenuItem large = new JRadioButtonMenuItem("Large");
+        
+        // default size selected
+        medium.setSelected(true);
+        
+        // add action listener for radio buttons
+        small.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                firePropertyChange("small", null, null);
+            }
+        });
+        medium.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                firePropertyChange("medium", null, null);
+            }
+        });
+        
+        large.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                firePropertyChange("large", null, null);
+            }
+        });
+        
+        // create JMenu button
+        final JMenu size = new JMenu("Size");
+        size.setMnemonic(KeyEvent.VK_S);
+        size.setOpaque(true);
+   
+        // add radio buttons to group button
+        group.add(small);
+        group.add(medium);
+        group.add(large);
+        
+        // add radio buttons to size menu 
+        size.add(small);
+        size.add(medium);
+        size.add(large);
+        
+        // create grid option and its action
+        final JCheckBoxMenuItem gridButton = new JCheckBoxMenuItem("Grid");
+        gridButton.setMnemonic(KeyEvent.VK_G);
+        gridButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+              //grid will be true if we select the check box     
+                myBoardPanel.setGrid(gridButton.isSelected()); 
+                myBoardPanel.repaint();
+            }
+        });
+        
+        // create color mode option and its action
+        final JCheckBoxMenuItem colorButton = new JCheckBoxMenuItem("Color Mode");
+        colorButton.setMnemonic(KeyEvent.VK_C);
+        colorButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+              //color mode will be true if we select the check box     
+                myBoardPanel.setColorMode(colorButton.isSelected()); 
+                myBoardPanel.repaint();
+            }
+        });
+        
+        // add size and grid buttons to option menu
+        optionMenu.add(size);
+        optionMenu.add(gridButton);
+        optionMenu.add(colorButton);
+        
+        // set color for background and foreground 
+        for (final Component c : size.getMenuComponents()) {
+            setBackForeGround(c);
+        }        
+        for (final Component c : optionMenu.getMenuComponents()) {
+            setBackForeGround(c);
+        }
+       
+        return optionMenu;
+    }
+    
+    
+    /**
+     * Create new game item.
+     * @return new menu item
+     */
+    public JMenuItem newGameMenuItem() {
+        // Set up new game
+        myNewGame.setEnabled(false);
+        myNewGame.setMnemonic(KeyEvent.VK_N);
+        myNewGame.setAccelerator(KeyStroke.getKeyStroke('N', KeyEvent.CTRL_MASK));
+        myNewGame.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                myBoard.newGame();
+                myMoveTimer.start();
+                myNewGame.setEnabled(false);
+                myEndGame.setEnabled(true);
+                myBoardPanel.setGameOver(false);            
+                myBoardPanel.repaint();
+            }
+            
+        });
+        return myNewGame;
+    }
+    
+    
+    /**
+     * Create end game item.
+     * @return new menu item
+     */
+    public JMenuItem endGameMenuItem() {
+        // set up end game
+        myEndGame.setMnemonic(KeyEvent.VK_E);
+        myEndGame.setAccelerator(KeyStroke.getKeyStroke('E', KeyEvent.CTRL_MASK));
+        myEndGame.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {
+                myNewGame.setEnabled(true);
+                myEndGame.setEnabled(false);
+                myBoardPanel.setGameOver(true);
+                myBoardPanel.removeKeyListener(myKey);
+                myMoveTimer.stop();
+                myBoardPanel.repaint();
+            }
+            
+        });
+        
+        return myEndGame;
+    }
+    
+    /**
+     * Create game instruction by using string builder.
+     * @return string builder message
+     */
+    public String gameInstructions() {
+        final StringBuilder str = new StringBuilder(400);
+        str.append(" Wellcome to Tetris game \n"
+                        + "How to play?\n"
+                        + "Press LEFT key to move left.\n"
+                        + "Press RIGHT key to move right.\n"
+                        + "Press DOWN key to move down 1 step.\n"
+                        + "Press A arrow key to rotate clock wise.\n"
+                        + "Press D arrow key to rotate counter clock wise.\n"
+                        + "Press SPACE key to make a hard drop quickly.\n"
+                        + "Press P key to pause the game.\n"
+                        + "Press R key to resume the game.\n"
+                        + "        ~~~~GOOD LUCK~~~~");
+        return str.toString();
+    }
+    
+    /**
+     * Set color for background and foreground.
+     * @param theC the component
+     */
+    public void setBackForeGround(final Component theC) {
+        theC.setBackground(Color.BLACK);
+        theC.setForeground(Color.green);
+    }
+    
+   
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}

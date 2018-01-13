@@ -1,0 +1,244 @@
+/*
+    * TCSS 305 
+    * Assignment 6 - Tetris
+    */
+
+package view;
+
+import action.KeyAction;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+
+import model.Board;
+
+/**
+ * GUI class for the Tetirs program.
+ * @author tvo93
+ * @version 3/2/2016
+ */
+public class TetrisGUI implements Observer, PropertyChangeListener  {
+  
+    /**The width of the game board.*/
+    private static final int WIDTH = 10;
+    
+    /** The delay (in milliseconds) for the move timer. */
+    private static final int DELAY = 400;
+   
+    /**The height of the game board.*/
+    private static final int HEIGHT = 20;
+    
+    /** The dimension for small game size. */
+    private static final Dimension SMALL_BOARD = new Dimension(200, 400);
+    
+    /** The dimension for medium game size. */
+    private static final Dimension MEDIUM_BOARD = new Dimension(300, 600);
+    
+    /** The dimension for large game size. */
+    private static final Dimension LARGE_BOARD = new Dimension(400, 800);
+    
+    
+    
+    /** A ToolKit. */
+    private static final Toolkit KIT = Toolkit.getDefaultToolkit();
+    
+    /** The Dimension of the screen. */
+    private static final Dimension SCREEN_SIZE = KIT.getScreenSize();
+
+    /**
+     * The board object that include all pieces and its logics.
+     */
+    private final Board myBoard = new Board(WIDTH, HEIGHT);
+   
+    /**
+     * The JFrame of the game.
+     */
+    private final JFrame myFrame;
+    
+   
+    /**
+     * The board panel.
+     */
+    private final TetrisBoardPanel myBoardPanel;
+    
+    /** The timer that controls the movement of blocks. */
+    private final Timer myMoveTimer;
+   
+    /**
+     * The key action that allows user to access the keys.
+     */
+    private final KeyAction myKeyAction;
+    /**
+     * The menu bar.
+     */
+    private final MenuBar myMenuBar;
+    
+    /**
+     * Preview panel.
+     */
+    private final PreviewPanel myPreviewPanel;
+    
+    /**
+     * About panel.
+     */
+    private final AboutPanel myAboutPanel;
+    
+    /**
+     * Constructs for tetris gui.
+     */
+    public TetrisGUI() {
+        myFrame = new JFrame("Tetris");
+        myBoard.newGame();
+        myKeyAction = new KeyAction(myBoard);
+       
+        myBoardPanel = new TetrisBoardPanel();
+        
+        myPreviewPanel = new PreviewPanel();
+        myAboutPanel = new AboutPanel();
+        myMenuBar = new MenuBar(myFrame, myBoardPanel);
+        
+        myMenuBar.addPropertyChangeListener(this);
+   
+        
+        myMoveTimer = new Timer(DELAY, null);
+        
+             
+    }
+    
+    /**
+     * start the GUI by setting up components and listeners.
+     */
+    public void start() {
+        // add observers       
+        myBoard.addObserver(myBoardPanel);
+        myBoard.addObserver(myPreviewPanel);
+        myBoard.addObserver(this);
+       
+       
+        
+        myMenuBar.setBackground(Color.LIGHT_GRAY);
+        myMenuBar.setForeground(Color.BLACK);
+        myFrame.setJMenuBar(myMenuBar);  
+     
+        setupCenter();
+        setupEast();
+        setupListeners();
+        
+        
+       // setBoardSize(SMALL, 20);
+        myFrame.setIconImage(new ImageIcon("icon.png").getImage());
+        myFrame.add(myBoardPanel, BorderLayout.CENTER);
+        
+        myFrame.pack();
+       
+        // position the frame in the center of the screen
+        myFrame.setLocation(SCREEN_SIZE.width / 2 - myFrame.getWidth() / 2,
+                    SCREEN_SIZE.height / 2 -   myFrame.getHeight() / 2);
+       
+        setBoardSize(MEDIUM_BOARD);
+        
+        myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        myFrame.setLocationRelativeTo(null);
+        myFrame.setResizable(false);
+        myFrame.setVisible(true);
+
+        
+    }
+    
+    /**
+     * Set the size for the board.
+     * @param theSize the size 
+     */
+    private void setBoardSize(final Dimension theSize) {
+        myBoardPanel.setPreferredSize(theSize);
+       
+        myFrame.pack();
+        myBoardPanel.repaint();
+    }
+    
+    /**
+     * Sets up the JPanel for the CENTER region.
+     */
+    private void setupCenter() {
+        
+        myBoardPanel.setFocusable(true);
+        myBoardPanel.requestFocusInWindow();
+        myBoardPanel.addKeyListener(myKeyAction);
+       
+        // create a panel that hold for board panel
+        final JPanel centerPanel = new JPanel();        
+        centerPanel.setBackground(Color.GRAY);       
+        centerPanel.add(myBoardPanel);       
+        myFrame.add(centerPanel, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Sets up the JPanel for the EAST region.
+     */
+    private void setupEast() {
+  
+        // create a panel that holds for other panels by using box layout
+        final JPanel eastPanel = new JPanel();
+        final BoxLayout b = new BoxLayout(eastPanel, BoxLayout.PAGE_AXIS);
+        
+     
+        // Add up components for eastPanel
+        eastPanel.setLayout(b);
+        eastPanel.setBackground(Color.GRAY);
+        eastPanel.add(myPreviewPanel); 
+       
+        eastPanel.add(myAboutPanel);
+        myFrame.add(eastPanel, BorderLayout.EAST);
+    }
+    
+    /**
+     * Property change for sizes.
+     * @param theP the property
+     */
+    public void propertyChange(final PropertyChangeEvent theP) {
+      
+        if ("small".equals(theP.getPropertyName())) {
+            setBoardSize(SMALL_BOARD);         
+        } else if ("medium".equals(theP.getPropertyName())) {
+            setBoardSize(MEDIUM_BOARD);
+        } else if ("large".equals(theP.getPropertyName())) {
+            setBoardSize(LARGE_BOARD);
+        }
+    }
+    /** Sets up event listeners. */
+    public void setupListeners() {
+        myMoveTimer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent theEvent) {              
+                myBoard.step();        
+            }
+        });     
+        myMoveTimer.start();  
+    }
+    
+    @Override
+    public void update(final Observable theObservable, final Object theData) {
+        if (theObservable instanceof Board && theData instanceof Boolean) {
+            myMoveTimer.stop();     
+            myBoardPanel.setGameOver(true);     
+            myFrame.validate();
+           
+        }
+    }
+    
+   
+}

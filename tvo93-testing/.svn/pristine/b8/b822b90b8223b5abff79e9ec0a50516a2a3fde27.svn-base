@@ -1,0 +1,185 @@
+/*
+ * TCSS 305
+ * Assignment 1 - Testing
+ */
+
+import static org.junit.Assert.*;
+
+import java.awt.Color;
+import java.awt.Point;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+/**
+ * This program tests for the Circle class.
+ * @author tvo93
+ * @version 1/11/2016
+ */
+public class CircleTest {
+    
+    /** A tolerance used when comparing double values for equality. */
+    private static final double TOLERANCE = .000001;
+    
+    /**
+     * Declare a public non-static ExpectedException Rule field. 
+     */
+    @Rule
+    public ExpectedException myThrown = ExpectedException.none();
+  
+   
+    /** A Circle to use in the test. */
+    private Circle myCircle;
+    
+   
+    /**
+     * A method to initialize the test fixture before each test.
+     */
+    @Before
+    // This method runs before EACH test method.
+    public void setUp() {
+        myCircle = new Circle();
+    }
+    
+    /**
+     * Test of the overloaded constructor.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testOverloadedConstructor() {
+        new Circle(1, null, null);     
+    }
+    
+    /**
+     * Test for null center.
+     */
+    @Test (expected = NullPointerException.class)
+    public void testCenter() {
+        myCircle.setCenter(null);
+    }
+    
+    /**
+     * Test for null color.
+     */
+    @Test (expected = NullPointerException.class)
+    public void testColor() {
+        myCircle.setColor(null);
+    }
+    
+    /**
+     * Test for negative radius.
+     */
+    @Test (expected = IllegalArgumentException.class)
+    public void testNegativeRadius() {
+        myCircle.setRadius(-1.0);
+    }
+    
+    /**
+     * Test for zero radius.
+     */
+    @Test (expected = IllegalArgumentException.class)
+    public void testZeroRadius() {
+        myCircle.setRadius(0.0);
+    }
+    
+    /**
+     * Test method for a valid circle.
+     */
+    @Test
+    public void testCircleDoublePointColor() {
+        new Circle(myCircle.getRadius(), myCircle.getCenter(), myCircle.getColor());
+        // Set the expected exception type
+        myThrown.expect(IllegalArgumentException.class);
+        // call for exception message
+        myThrown.expectMessage("The radius must be a positive value!");
+        // Set the radius equal zero that should throw an exception
+        new Circle(0.0, myCircle.getCenter(), myCircle.getColor());
+    }
+
+    /**
+     * Test method for black unit circle centered at the origin.
+     */
+    @Test
+    public void testCircle() {
+        new Circle(1.0, new Point(0, 0), Color.BLACK);
+    }
+
+    /**
+     * Test method for the radius of the circle.
+     */
+    @Test
+    public void testSetRadius() {
+        // Set the radius equal 1.5
+        // Then the getRadius method should have a value of 1.5
+        myCircle.setRadius(1.5);
+        assertEquals("Test for the radius failed!", 1.5, myCircle.getRadius(), TOLERANCE);
+    }
+
+    /**
+     * Test method for the point of the circle.
+     */
+    @Test
+    public void testSetCenter() {
+        // create a point to test
+        final Point p1 = new Point(1, 2);
+        // Set the center equal (1, 2)
+        // then the getCenter method should have a value of (1, 2)    
+        myCircle.setCenter(p1);
+        assertEquals("Test for the center failed!", p1, myCircle.getCenter());
+    }
+
+    /**
+     * Test method for the color of the circle.
+     */
+    @Test
+    public void testSetColor() {
+        // set for the green color
+        myCircle.setColor(Color.GREEN);
+        assertEquals("Test for the color failed!", Color.GREEN, myCircle.getColor());
+    }
+
+
+    /**
+     * Test method for calculate diameter of the circle.
+     */
+    @Test
+    public void testCalculateDiameter() {
+        // Set up the radius equal 3.0 to test the diameter
+        myCircle.setRadius(3.0);
+        assertEquals("Test for calculate diameter", myCircle.getRadius() * 2, 
+                     myCircle.calculateDiameter(), TOLERANCE);      
+    }
+    
+    /**
+     * Test method for calculate Circumference of the circle.
+     */
+    @Test
+    public void testCalculateCircumference() {
+        assertEquals("Test for calculate circumference", 
+                     myCircle.calculateDiameter() * Math.PI, 
+                     myCircle.calculateCircumference(), TOLERANCE);
+    }
+
+    /**
+     * Test method for calculate area of the circle.
+     */
+    @Test
+    public void testCalculateArea() {
+        assertEquals("Test for calculate circumference",
+                     myCircle.getRadius() * myCircle.getRadius() * Math.PI, 
+                     myCircle.calculateArea(), TOLERANCE);
+    }
+
+    /**
+     * Test method for {@link Circle#toString()}.
+     */
+    @Test
+    public void testToString() {
+        assertEquals("Test for toString result!", 
+                     "Circle [radius=1.00, center=java.awt.Point[x=0,y=0], "
+                     + "color=java.awt.Color[r=0,g=0,b=0]]", 
+                     myCircle.toString());
+    }
+
+}

@@ -1,0 +1,106 @@
+/*
+ * TCSS 305 - Easy Street
+ */
+
+package model;
+
+import java.util.Map;
+
+/**
+ * Represent for bicycle vehicle.
+ * @author tvo93
+ * @version 1/26/2016
+ */
+public class Bicycle extends AbstractVehicle {
+    
+    /**
+     * Time to get back to alive.
+     */
+    private static final int DEATH_TIME = 30;
+    
+    /**
+     * Constructs for bicycle class.
+     * @param theX x coordinate
+     * @param theY y coordinate
+     * @param theDir direction
+     */
+    public Bicycle(final int theX, final int theY, final Direction theDir) {
+        super(theX, theY, theDir, DEATH_TIME, "Bicycle");
+    }
+    
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        boolean bycPass = false;
+        // bicycle can start on light, street, and trail
+        // pass green light
+        if (theTerrain.equals(Terrain.LIGHT) && theLight.equals(Light.GREEN)
+                    || theTerrain.equals(Terrain.STREET) 
+                    || theTerrain.equals(Terrain.TRAIL)) {      
+            bycPass = true;         
+        } 
+        return bycPass;  // can not pass yellow or red light
+    }
+    
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {      
+        Direction bycDir = getDirection();
+        // prefer go straight ahead on trail
+        if (theNeighbors.get(bycDir).equals(Terrain.TRAIL)) {
+            bycDir = getDirection();   
+            // will find the way to turn to trail if on street or light
+        } else if (theNeighbors.get(bycDir).equals(Terrain.STREET)
+                        || (theNeighbors.get(bycDir).equals(Terrain.LIGHT))) {
+            bycDir = turnToTrail(theNeighbors);
+            // avoid wall and grass
+            // but will find the way to turn to trail
+            // or turn to street or light
+        } else if (theNeighbors.get(bycDir).equals(Terrain.WALL)
+                        || theNeighbors.get(bycDir).equals(Terrain.GRASS)) {
+            bycDir = turnToTrail(theNeighbors);
+            bycDir = canRun(theNeighbors);
+        } 
+        return bycDir;
+    }
+    
+    /**
+     * Bicycle's movement when it is facing with the wall.
+     * @param theNeighbors the terrain around the bicycle
+     * @return the direction
+     */
+    private Direction canRun(final Map<Direction, Terrain> theNeighbors) {
+        Direction wallDir = getDirection();
+           // turn to left if possible
+        if (theNeighbors.get(wallDir.left()).equals(Terrain.STREET) 
+                || theNeighbors.get(wallDir.left()).equals(Terrain.TRAIL)
+                || theNeighbors.get(wallDir.left()).equals(Terrain.LIGHT)) {
+            wallDir = wallDir.left();
+            // turn right if possible
+        } else if (theNeighbors.get(wallDir.right()).equals(Terrain.STREET) 
+                            || theNeighbors.get(wallDir.right()).equals(Terrain.TRAIL)
+                            || theNeighbors.get(wallDir.right()).equals(Terrain.LIGHT)) {
+            wallDir = wallDir.right(); 
+        } else {
+            // turn around
+            wallDir = wallDir.reverse();
+        }  
+        return wallDir;
+    }
+    
+    /**
+     * Bicycle's movement when it is facing with trail.
+     * @param theNeighbors the terrain around the bicycle
+     * @return the direction
+     */
+    private Direction turnToTrail(final Map<Direction, Terrain> theNeighbors) {
+        Direction trailDir = getDirection();
+        // turn left if terrain is trail
+        if (theNeighbors.get(trailDir.left()).equals(Terrain.TRAIL)) {
+            trailDir = trailDir.left();
+            // turn right if terrain is right
+        } else if (theNeighbors.get(trailDir.right()).equals(Terrain.TRAIL)) {
+            trailDir = trailDir.right();
+        }
+        return trailDir;
+    }
+}
+    

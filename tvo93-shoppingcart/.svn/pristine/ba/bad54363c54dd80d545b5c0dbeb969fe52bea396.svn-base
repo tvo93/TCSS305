@@ -1,0 +1,140 @@
+/*
+ * TCSS 305 Assignment 2 - Shopping Cart
+ */
+
+package tests;
+
+import static org.junit.Assert.*;
+
+import java.math.BigDecimal;
+import model.Item;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+
+
+
+
+/**
+ * Test for the Item class.
+ * @author tvo93
+ * @version 1/20/2016
+ */
+public class ItemTest {
+    
+    /** The item name that will be used to test. */
+    private static final String NAME_ITEM = "Silly Putty";
+    
+    // using a Rule in tests requires a public field
+    /** An expected exception rule that can be used in tests where exceptions are expected. */
+    @Rule
+    public final ExpectedException myThrown = ExpectedException.none();
+    
+    /** The item price that will be used to test. */
+    private final BigDecimal myItemPrice = new BigDecimal("4.41");
+    
+    /** The bulk price that will be used to test. */
+    private final BigDecimal myBulkPrice = new BigDecimal("10.04");
+    
+    /** Create an Item to test the class. */
+    private Item myItem;
+    
+    /**
+     * A method to initialize the test fixture before each test.
+     */
+    @Before
+    public void setUp() {
+        myItem = new Item(NAME_ITEM, myItemPrice, 6, myBulkPrice);
+    }
+    
+    /**
+     * Test method for {@link model.Item#Item(java.lang.String, java.math.BigDecimal)}.
+     */
+    @Test
+    public void testItemStringBigDecimal() {
+        myItem = new Item(NAME_ITEM, myItemPrice);
+    }
+
+    
+    /**
+     * Test of the copy constructor when the the color and point are null.
+     */
+    @Test(expected = IllegalArgumentException.class) 
+    public void testItemPriceNegative() {
+        new Item(NAME_ITEM, myItemPrice.negate(), 6, myBulkPrice);
+    }
+    
+    /**
+     * Test method for {@link model.Item#hashCode()}.
+     */
+    @Test
+    public void testHashCode() {
+        final Item item1 = new Item(NAME_ITEM, myItemPrice, 6, myBulkPrice);
+        assertEquals("Test hashCode method in the Item class", myItem.hashCode(), 
+                     item1.hashCode());
+    }
+
+
+ 
+    /**
+     * Test method for constructor with 4 parameters.
+     */
+    @Test
+    public void testItemStringBigDecimalIntBigDecimal() {
+        myItem = new Item(NAME_ITEM, myItemPrice, 6, myBulkPrice);
+    }
+
+    /**
+     * Test for bulk quality item.
+     */
+    @Test
+    public void testIsBulk() {
+        final Item item2 = new Item(NAME_ITEM, myItemPrice, 6, myBulkPrice);
+        assertEquals("Test for bulk quantity item", item2.isBulk(), myItem.isBulk());
+    }
+    
+    
+    /**
+     * Test for not bulk quality item.
+     */
+    @Test
+    public void testNotIsBulk() {
+        final Item item3 = new Item(NAME_ITEM, myItemPrice, 0, myBulkPrice);
+        assertNotEquals("Test for bulk quantity item", item3.isBulk(), myItem.isBulk());
+    }
+    
+    /**
+     * Test method for regular item.
+     */
+    @Test
+    public void testRegularToString() {
+        final Item item3 = new Item(NAME_ITEM, myItemPrice, 0, myBulkPrice);      
+        assertEquals("toString() produced an unexpected result!",
+                     "Silly Putty, $4.41",
+                     item3.toString());
+        
+    }
+
+    /**
+     * Test method for bulk item.
+     */
+    @Test
+    public void testBulkToString() {
+        final Item item4 = new Item(NAME_ITEM, myItemPrice, 6, myBulkPrice);
+        assertEquals("toString() produced an unexpected result!",
+                     "Silly Putty, $4.41 (6 for $10.04)",
+                     item4.toString());
+        
+    }
+    
+    /**
+     * Test method for {@link model.Item#equals(java.lang.Object)}.
+     */
+    @Test
+    public void testEqualsObject() {
+        fail("Not yet implemented");
+    }
+
+}

@@ -1,0 +1,140 @@
+/*
+    * TCSS 305 
+    * Assignment 6 - Tetris
+    */
+
+package view;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JPanel;
+
+import model.Block;
+import model.Board;
+import model.Point;
+import model.TetrisPiece;
+
+
+
+
+/**
+ * Board Panel to display the Board game on the panel.
+ * @author tvo93
+ * @version 3/2/2016
+ */
+public class TetrisBoardPanel extends JPanel implements Observer {
+
+  
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The width of default size of the board panel(medium).
+     */
+    private static final int DEFAULT_BOARD_WIDTH = 300;
+    
+    /**
+     * Size of blocks.
+     */
+    private static final int BLOCK_SIZE = 30;
+    
+    /**
+     * The height of default size the board panel(medium).
+     */
+    private static final int DEFAULT_BOARD_HEIGHT = 600;
+    
+    /**
+     * Tetris block lists.
+     */
+    private final List<Block[]> myTetrisBlocks;
+      
+    /**
+     * Constructs the BoardPanel.
+     */
+    public TetrisBoardPanel() {
+        super();
+        
+        myTetrisBlocks = new ArrayList<Block[]>();
+       
+        setBackground(Color.BLACK);
+        setPreferredSize(new Dimension(DEFAULT_BOARD_WIDTH, DEFAULT_BOARD_HEIGHT));
+        setVisible(true);
+       
+      
+    }
+    
+    /**
+     * Repaints the component with the specified graphics context.
+     * Draw the pieces.
+     * @param theGraphics the graphic context
+     */
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g = (Graphics2D) theGraphics;
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);   
+       // final Iterator<Color[]> itr = myColor.iterator();
+        
+        for (int i = 0; i < myTetrisBlocks.size(); i++) {
+            
+            final Block[] blockArray = myTetrisBlocks.get(i);
+           // final Color[] colorArray = itr.next();
+            
+            
+            
+          
+           
+            
+            
+            for (int j = 0; j < blockArray.length; j++) {
+               
+                final Point point = new Point(j * BLOCK_SIZE, i * BLOCK_SIZE);
+               
+               
+               
+                if (blockArray[j] != null) {
+                    g.setColor(Color.WHITE);
+                    g.fill3DRect(point.x(), getHeight() - point.y() -  BLOCK_SIZE, 
+                                 BLOCK_SIZE, BLOCK_SIZE, true);
+                    g.setColor(Color.RED);
+//                    g.drawRoundRect(point.x(), getHeight() - point.y() - BLOCK_SIZE, 
+//                                    BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                   
+                    g.draw3DRect(point.x(), getHeight() - point.y() -  BLOCK_SIZE, 
+                                BLOCK_SIZE, BLOCK_SIZE, true);
+                }
+                
+                
+            }
+        }
+        
+    }
+   
+    @Override
+    public void update(final Observable theObservable, final Object theData) {
+        
+        if (theObservable instanceof Board && theData instanceof List) {
+            myTetrisBlocks.clear();
+            
+            for (int i = 0; i < ((List<?>) theData).size(); i++) {
+                final Block[] colorArray = (Block[]) ((List<?>) theData).get(i);
+                myTetrisBlocks.add(colorArray);
+            }
+        }
+        
+        repaint(); 
+    }
+     
+}
+

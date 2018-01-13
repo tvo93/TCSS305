@@ -1,0 +1,146 @@
+package view;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+
+/**
+ * A class that creates menu bar for the frame.
+ * @author tvo93
+ * @version 2/26/2016
+ */
+public class MenuBar extends JMenuBar {
+
+    /** A generated serialization ID. */
+    private static final long serialVersionUID = 1L;
+    
+    /**
+     * A menu item for new game.
+     */
+    private final JMenuItem myNewGame = new JMenuItem("New Game");
+    
+    /**
+     * A menu item for end game.
+     */
+    private final JMenuItem myEndGame = new JMenuItem("End Game");
+    
+    /** A file menu for the frame. */
+    private final JMenu myHelpMenu = new JMenu("Help");
+    
+    /**
+     * Boar panel.
+     */
+    private final TetrisBoardPanel myBoardPanel;
+    
+    /**
+     * Constructs for the menu bar.
+     * @param theFrame the JFrame
+     * @param theBoardPanel the Board Panel
+     */
+    public MenuBar(final JFrame theFrame, final TetrisBoardPanel theBoardPanel) {
+        super();
+        myBoardPanel = theBoardPanel;
+        add(createFileMenu(theFrame));
+        add(createHelpMenu());
+    }
+    
+    /**
+     * Create file menu.
+     * @return file menu
+     * @param theFrame the frame
+     */
+    public JMenu createFileMenu(final JFrame theFrame) {
+
+        // set up quit option
+        final JMenuItem quitButton = new JMenuItem("Quit");
+        quitButton.setMnemonic(KeyEvent.VK_Q);
+        quitButton.setAccelerator(KeyStroke.getKeyStroke('Q', KeyEvent.CTRL_MASK));
+        quitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                theFrame.dispatchEvent(new WindowEvent(theFrame,
+                                                       WindowEvent.WINDOW_CLOSING));
+            }
+        });
+        
+        // Add menu items in file menu
+        final JMenu menuFile = new JMenu("File");
+        
+        menuFile.setMnemonic(KeyEvent.VK_F);
+        myNewGame.setMnemonic(KeyEvent.VK_N);
+        myEndGame.setMnemonic(KeyEvent.VK_E);
+        
+        menuFile.add(myNewGame);
+        menuFile.addSeparator();
+        menuFile.add(myEndGame);
+        menuFile.addSeparator();
+        menuFile.add(quitButton);
+ 
+        // get all file menu item here
+        return menuFile;      
+    }
+    
+    /**
+     * Create help menu.
+     * @return help menu
+     */
+    public final JMenu createHelpMenu() {
+        myHelpMenu.setMnemonic(KeyEvent.VK_H);
+       
+        // about menu item
+        final JMenuItem about = new JMenuItem("About...");
+        about.setMnemonic(KeyEvent.VK_A);
+        about.setAccelerator(KeyStroke.getKeyStroke('A', KeyEvent.CTRL_MASK));
+        final ImageIcon icon = new ImageIcon("label.png");
+        about.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                JOptionPane.showMessageDialog(myBoardPanel, gameInstructions(), 
+                                              "About", JOptionPane.OK_OPTION, icon);
+            }  
+        });
+        
+        myHelpMenu.add(about);
+        return myHelpMenu;
+    }
+    
+    /**
+     * Create game instruction by using string builder.
+     * @return string builder message
+     */
+    public String gameInstructions() {
+        final StringBuilder str = new StringBuilder(400);
+        str.append(" Wellcome to Tetris game \n"
+                        + "How to play?\n"
+                        + "Press LEFT key to move left.\n"
+                        + "Press RIGHT key to move right.\n"
+                        + "Press S key to move down 1 step.\n"
+                        + "Press UP arrow key to rotate clock wise.\n"
+                        + "Press DOWN arrow key to rotate counter clock wise.\n"
+                        + "Press SPACE key to make a hard drop quickly.\n"
+                        + "Press P key to pause the game.\n"
+                        + "        ~~~~GOOD LUCK~~~~");
+        return str.toString();
+    }
+    
+    
+   
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}

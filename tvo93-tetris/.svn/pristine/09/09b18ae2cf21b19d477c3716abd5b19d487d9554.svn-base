@@ -1,0 +1,137 @@
+/*
+    * TCSS 305 
+    * Assignment 6 - Tetris
+    */
+
+package view;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
+
+import model.Board;
+import model.Point;
+import model.TetrisPiece;
+
+/**
+ * Preview next pieces.
+ * @author tvo93
+ * @version 3/4/2016
+ */
+public class PreviewPanel extends JPanel implements Observer  {
+    
+    /** A generated serialization ID. */
+    private static final long serialVersionUID = 1L;
+   
+    /**
+     * Size of blocks.
+     */
+    private static final int BLOCK_SIZE = 30;
+    
+    
+    /** The scale.*/
+    private static final int SCALE = 3;
+    
+    /**
+     * The width of default size of the preview panel(medium).
+     */
+    private static final int DEFAULT_PREVIEW_WIDTH = 300;
+    
+    /**
+     * The height of default size the preview panel(medium).
+     */
+    private static final int DEFAULT_PREVIEW_HEIGHT = 100;
+ 
+    /** Piece that is next to play. */
+    private TetrisPiece myNextPiece;
+  
+    /**
+     * The board panel.
+     */
+    private final TetrisBoardPanel myBoardPanel;
+    
+    /**
+     * Construct for the preview panel class.
+     * @param theBoardPanel the board panel
+     */
+    public PreviewPanel(final TetrisBoardPanel theBoardPanel) {
+        super();
+        setBackground(Color.BLACK);
+        setupBorder();
+        myBoardPanel = theBoardPanel;
+        setPreferredSize(new Dimension(DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT));
+    }
+
+    
+    /**
+     * Repaints the component with the specified graphics context.
+     * Draw the next pieces.
+     * @param theGraphics the graphic context
+     */
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);         
+        final Graphics2D g = (Graphics2D) theGraphics;
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+                               RenderingHints.VALUE_ANTIALIAS_ON);
+        
+      
+        drawRectShape(g, Color.GREEN);
+        if (myBoardPanel.isModeColor()) {
+            drawRectShape(g, myBoardPanel.randomColor());
+        }
+        
+         
+    }
+    
+    
+    /**
+     * A method that displays blocks as rectangle shape.
+     * @param theGraphics the graphic
+     * @param theColor the color
+     */
+    public void drawRectShape(final Graphics2D theGraphics, final Color theColor) {
+        super.paintComponent(theGraphics);         
+        final Graphics2D g = (Graphics2D) theGraphics;
+        if (myNextPiece != null) {
+            for (int i = 0; i < myNextPiece.getPoints().length; i++) {          
+                final Point point = myNextPiece.getPoints()[i];      
+                g.setColor(theColor);
+                g.fill3DRect(point.x() * BLOCK_SIZE + getWidth() / SCALE, 
+                          getHeight() - (point.y() * BLOCK_SIZE) - getHeight() 
+                          + SCALE * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, true);        
+                repaint();
+            }
+        }
+        
+        
+    }
+    
+    /**
+     * This method creates a border for the panel.
+     */
+    private void setupBorder() {
+        final TitledBorder title = new TitledBorder("Next Piece");
+        title.setTitleColor(Color.RED);
+        title.setTitleJustification(TitledBorder.CENTER);
+        setBorder(title);
+    }
+    
+    @Override
+    public void update(final Observable theObservable, final Object theData) {
+        
+        if (theObservable instanceof Board && theData instanceof TetrisPiece) {
+            myNextPiece = (TetrisPiece) theData;
+        }
+
+        repaint();
+    }
+    
+
+}

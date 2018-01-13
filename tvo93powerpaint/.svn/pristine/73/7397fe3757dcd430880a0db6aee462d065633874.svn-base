@@ -1,0 +1,53 @@
+/*
+ * TCSS 305
+ * Assignment 5 - PowerPaint
+ */
+
+package tools;
+
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
+
+/**
+ * A class that draw rectangle implementing interface Shape tool.
+ * @author tvo93
+ * @version November
+ */
+public class Rectangle implements ShapeTools {
+    
+    /**
+     * create rectangle.
+     */
+    private Rectangle2D.Double myRectangel = new Rectangle2D.Double(); 
+    
+    /**
+     * The x coordinate.
+     */
+    private int myX;
+    
+    /**
+     * the y coordinate.
+     */
+    private int myY;
+    
+    @Override
+    public Shape setStartPoint(final Point thePoint) {
+        myX = thePoint.x;
+        myY = thePoint.y;
+        
+        myRectangel = (Rectangle2D.Double) myRectangel.clone();
+        myRectangel.setFrameFromDiagonal(myX, myY, thePoint.x, thePoint.y);     
+        return myRectangel;
+    }
+//    @Override
+//    public Shape setMovePoint(final Point thePoint) {
+//        return myRectangel;
+//    }
+    @Override
+    public Shape setEndPoint(final Point thePoint) {
+        myRectangel.setFrameFromDiagonal(myX, myY, thePoint.x, thePoint.y);
+        return myRectangel;
+    }
+
+}

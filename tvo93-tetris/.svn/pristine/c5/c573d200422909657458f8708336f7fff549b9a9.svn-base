@@ -1,0 +1,64 @@
+
+/*
+    * TCSS 305 
+    * Assignment 6 - Tetris
+    */
+
+package action;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import view.PreviewPanel;
+import view.TetrisBoardPanel;
+
+
+
+/**
+ * Oval action for the GUI.
+ * @author tvo93
+ * @version 3/8/2016
+ */
+public class OvalAction  extends AbstractAction implements ActionListener {
+
+    /** A generated serialization ID. */
+    private static final long serialVersionUID = 2431495374140330942L;
+    
+    /** 
+     * A board panel.
+     */
+    private final TetrisBoardPanel myBoardPanel;
+    
+    /** 
+     * A preview board panel.
+     */
+    private final PreviewPanel myPreviewPanel;
+   
+    /**
+     * Display the board by Oval shape.
+     * @param theBoardPanel the board panel
+     * @param thePreviewPanel the preview panel
+     * @param theName the name
+     */
+    public OvalAction(final TetrisBoardPanel theBoardPanel, 
+                      final PreviewPanel thePreviewPanel,
+                      final String theName) {
+        super(theName);
+        myBoardPanel = theBoardPanel;
+        myPreviewPanel = thePreviewPanel;
+        putValue(Action.SELECTED_KEY, false);
+    }
+    
+    @Override
+    public void actionPerformed(final ActionEvent theEvent) {
+        myBoardPanel.setRect(false);
+        myBoardPanel.setTriangle(false);
+        myBoardPanel.setOval(true);
+        myBoardPanel.setSmile(false);
+        myBoardPanel.repaint();
+        myPreviewPanel.repaint();
+    }
+
+}

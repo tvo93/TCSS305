@@ -1,0 +1,57 @@
+/*
+ * TCSS 305
+ * Assignment 5 - PowerPaint
+ */
+package action;
+
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
+
+
+
+
+/**
+ * Line action for the GUI.
+ * @author tvo93
+ * @version 10 October 2015
+ */
+public class Line  extends AbstractAction implements ActionListener {
+
+    /** A generated serialization ID. */
+    private static final long serialVersionUID = 2431495374140330942L;
+   
+    
+   
+  /**
+   * Construct the line action.
+   * @param theName the Name of action
+   * @param theIcon the icon of action
+   * @param theDescription the description
+   * @param theMnemonic the mnemonic
+   */
+    public Line(
+                      final String theName, 
+                      final ImageIcon theIcon,
+                    
+                      final String theDescription, 
+                      final Integer theMnemonic) {
+        super(theName, theIcon);
+       
+        
+        putValue(SHORT_DESCRIPTION, theDescription);
+        putValue(MNEMONIC_KEY, theMnemonic);
+        putValue(Action.SELECTED_KEY, false);
+    }
+    
+    @Override
+    public void actionPerformed(final ActionEvent theEvent) {
+       
+    }
+
+}

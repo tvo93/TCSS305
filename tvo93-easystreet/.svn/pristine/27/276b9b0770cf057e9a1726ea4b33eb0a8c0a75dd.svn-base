@@ -1,0 +1,64 @@
+/*
+ * TCSS 305 - Easy Street
+ */
+
+package model;
+
+import java.util.Map;
+
+/**
+ * Represent for truck vehicle.
+ * @author tvo93
+ * @version 1/26/2016
+ */
+public class Truck extends AbstractVehicle {
+    
+    /**
+     * Time to get back to alive.
+     */
+    private static final int DEATH_TIME = 0;
+    
+    /**
+     * Constructs for truck class.
+     * @param theX x coordinate
+     * @param theY y coordinate
+     * @param theDir direction
+     */
+    public Truck(final int theX, final int theY, final Direction theDir) {
+        super(theX, theY, theDir, DEATH_TIME, "Truck");
+    }
+    
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        return theTerrain.equals(Terrain.STREET) || theTerrain.equals(Terrain.LIGHT);
+    }
+    
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        // truck is running by random direction
+        Direction truckDir = Direction.random();
+        
+        // truck only can run on street and light
+        // turn left if can not go straight
+        // turn right if can not turn left
+        final boolean canRun = theNeighbors.get(getDirection()).equals(Terrain.STREET)
+                        || theNeighbors.get(getDirection()).equals(Terrain.LIGHT)
+                        || theNeighbors.get(getDirection().left()).equals(Terrain.LIGHT)
+                        || theNeighbors.get(getDirection().left()).equals(Terrain.STREET)
+                        || theNeighbors.get(getDirection().right()).equals(Terrain.LIGHT)
+                        || theNeighbors.get(getDirection().right()).equals(Terrain.STREET);
+        
+        if (canRun) {
+            while (!theNeighbors.get(truckDir).equals(Terrain.STREET) 
+                            && !theNeighbors.get(truckDir).equals(Terrain.LIGHT)
+                            || truckDir == getDirection().reverse()) {
+                truckDir = Direction.random();
+            }
+        } else {
+         // turn around if none of legal directions 
+            truckDir.reverse(); 
+        }
+        return truckDir; 
+    }
+    
+}

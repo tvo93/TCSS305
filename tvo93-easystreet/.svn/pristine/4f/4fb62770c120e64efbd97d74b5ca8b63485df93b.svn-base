@@ -1,0 +1,69 @@
+/*
+ * TCSS 305 - Easy Street
+ */
+
+package model;
+
+import java.util.Map;
+
+/**
+ * Represent for car vehicle.
+ * @author tvo93
+ * @version 1/26/2016
+ */
+public class Car extends AbstractVehicle {
+    
+    /**
+     * Time to get back to alive.
+     */
+    private static final int DEATH_TIME = 10;
+    
+    /**
+     * Constructs for car class.
+     * @param theX x coordinate
+     * @param theY y coordinate
+     * @param theDir direction
+     */
+    public Car(final int theX, final int theY, final Direction theDir) {
+        super(theX, theY, theDir, DEATH_TIME, "Car");
+    }
+    
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        boolean carPass = true;
+        if ((theTerrain == (Terrain.LIGHT) && theLight == (Light.GREEN))
+             || (theTerrain == (Terrain.LIGHT) && theLight == (Light.YELLOW))) {
+           
+            carPass = true;
+        } else if (theTerrain == (Terrain.LIGHT) && theLight == (Light.RED)) {
+            carPass = false;
+        }
+        return carPass;
+
+    }
+    
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        // car prefers run straight ahead
+        Direction carDir = getDirection();
+        
+        // check if in front of the car are grass, wall or trail
+        if (theNeighbors.get(carDir).equals(Terrain.GRASS) 
+                        || theNeighbors.get(carDir).equals(Terrain.WALL)
+                        || theNeighbors.get(carDir).equals(Terrain.TRAIL)) {
+            // car will turn left if possible
+            if (theNeighbors.get(carDir.left()).equals(Terrain.LIGHT)
+                            || theNeighbors.get(carDir.left()).equals(Terrain.STREET)) {
+                carDir = getDirection().left();
+            } else if (theNeighbors.get(carDir.right()).equals(Terrain.LIGHT)
+                            || theNeighbors.get(carDir.right()).equals(Terrain.STREET)) {
+                carDir = getDirection().right(); // turn right otherwise
+            } else {
+                carDir = carDir.reverse(); // turn around if can not turn left or right
+            }
+        }
+                
+        return carDir; 
+    }
+    
+}

@@ -1,0 +1,230 @@
+/*
+ * TCSS 305 - Easy Street
+ */
+package model;
+
+import java.util.Map;
+
+/**
+ * Represents default behavior for Vehicle subclasses.
+ * @author tvo93
+ * @version 1/26/2016
+ */
+public abstract class AbstractVehicle implements Vehicle {
+    
+    /**
+     * The x-coordinate.
+     */
+    private int myX;
+    
+    /**
+     * The y-coordinate.
+     */
+    private int myY;
+    
+    /**
+     * The start x-coordinate.
+     */
+    private final int myStartX;
+    
+    /**
+     * The initial y-coordinate.
+     */
+    private final int myStartY;
+    
+    /**
+     * The vehicle direction.
+     */
+    private Direction myDirection;
+    
+    /**
+     * The initial vehicle direction.
+     */
+    private final Direction myStartDirection;
+    
+    /**
+     * The amount of time if the vehicle is dead.
+     */
+    private final int myDeathTime; 
+   
+    /**
+     * The name of vehicle.
+     */
+    private String myName;
+    
+    /**
+     * The time the vehicle wait to revived.
+     */
+    private int myWaitTime;
+
+    /**
+     * Constructor for abstractVehicle class.
+     * @author tvo93
+     * @version 
+     * @param theX the x coordinate of vehicle
+     * @param theY the y coordinate of vehicle
+     * @param theDirection the direction of vehicle
+     * @param theDeathTime the time of vehicle to wait for alive.
+     * @param theName the name of vehicle
+     */
+    public AbstractVehicle(final int theX, final int theY,
+                           final Direction theDirection, 
+                           final int theDeathTime, final String theName) {
+       
+       
+        myX = theX;
+        myStartY = theY;
+        myY = theY;
+        myStartDirection = theDirection;
+        myDirection = myStartDirection;
+        myDeathTime = theDeathTime;
+        myWaitTime = theDeathTime;
+        myName = theName;
+        myStartX = myX;
+        
+    }
+   
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        return !theTerrain.equals(Terrain.WALL); 
+        
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        Direction vehicleDirection = getDirection(); 
+        
+       
+        if (theNeighbors.get(getDirection()).equals(Terrain.WALL)) {
+            vehicleDirection = getDirection().left();
+            vehicleDirection = getDirection().right();
+        }
+        return vehicleDirection;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void collide(final Vehicle theOther) {
+     
+        if (isAlive() && theOther.isAlive()
+            && theOther.getDeathTime() < myDeathTime) {
+            myWaitTime = 0; 
+        }
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public int getDeathTime() {
+        return myDeathTime; 
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getImageFileName() {
+        String checkImage = ""; 
+        if (isAlive()) {
+            
+            // display the alive vehicles images without overriding 
+            // by using getClass().getSimpleName() method
+            checkImage = getClass().getSimpleName() + ".gif";
+        } else {
+            
+         // display the dead vehicles images without overriding 
+            // by using getClass().getSimpleName() method
+            checkImage = getClass().getSimpleName() + "_dead.gif";
+        }
+        return checkImage; //return the image if they go back to be alive or otherwise.
+    }
+    
+   
+
+    /** {@inheritDoc} */
+    @Override
+    public Direction getDirection() {
+        return myDirection; //return the vehicle's direction
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getX() {
+        return myX;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getY() {
+        return myY;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isAlive() {
+        return myWaitTime == myDeathTime;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void poke() {
+        if (isAlive()) {
+            
+            // When a dead vehicle revives, 
+           // it must set its direction to be a random direction.
+            myDirection = Direction.random(); 
+        } else {
+            
+            // If dead, waiting time will be counted up to 
+            // death time to make the vehicle alive
+            myWaitTime++; 
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void reset() {
+        
+        // reset to the original coordinates
+        // and they are all alive. 
+        myX = myStartX;
+        myY = myStartY;
+        myDirection = myStartDirection;
+        myWaitTime = myDeathTime;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setDirection(final Direction theDir) {
+        myDirection = theDir;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setX(final int theX) {
+        myX = theX;
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setY(final int theY) {
+        myY = theY;
+
+    }
+    /**
+     * Return a name of vehicle.
+     * @return name of vehicle
+     */
+    public String toString() {
+        if (isAlive()) {
+            // vehicles name will be displayed when they are alive
+            myName = getClass().getSimpleName();
+        } else {
+            // poke and the waiting time number will be displayed if
+            // they are dead
+            myName = "poke: " + myWaitTime;
+        }
+        return myName;
+    }
+}

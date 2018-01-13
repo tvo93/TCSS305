@@ -1,0 +1,172 @@
+/*
+ * TCSS 305
+ * Assignment 5 - PowerPaint
+ */
+
+package gui;
+
+import action.Ellipse;
+import action.Line;
+import action.Pencil;
+import action.Rectangle;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+
+
+/**
+ * The graphical user interface for the PowerPaint program.
+ * @author tvo93
+ * @version 2/10/2016
+ */
+public class PowerPaintGUI {
+
+    /** A ToolKit. */
+    private static final Toolkit KIT = Toolkit.getDefaultToolkit();
+    
+    /** The Dimension of the screen. */
+    private static final Dimension SCREEN_SIZE = KIT.getScreenSize();
+    
+    /**
+     * The pencil action.
+     */
+    private Action myPencil;
+   
+    /**
+     * The line action.
+     */
+    private Action myLine;
+    
+    /**
+     * The rectangle action.
+     */
+    private Action myRectangle; 
+    
+    /**
+     * The ellipse action.
+     */
+    private Action myEllipse;
+    
+    /**
+     * The Panel for the GUI.
+     */
+    private final PowerPaintPanel myPanel;
+    /**
+     * The frame for the program.
+     */
+    private final JFrame myFrame;
+    
+    /**
+     * Constructs for the GUI.
+     */
+    public PowerPaintGUI() {
+        super();
+        myFrame = new JFrame("PowerPaint");
+        myPanel = new PowerPaintPanel();
+        
+        
+        final MouseAdapter mouse = new MouseTask();
+        myPanel.addMouseListener(mouse);
+        myPanel.addMouseMotionListener(mouse);
+        
+        
+        
+        // position the frame in the center of the screen
+        myFrame.setLocation(SCREEN_SIZE.width / 2 - myFrame.getWidth() / 2,
+                            SCREEN_SIZE.height / 2 - myFrame.getHeight() / 2);   
+        myPanel.setPreferredSize(myPanel.getPreferredSize());
+        myFrame.pack();
+    }
+    
+    /**
+     * Start the GUI.
+     */
+    public void start() {
+        
+        // create menu bar
+        final MenuBar menuBar = new MenuBar(myFrame, myPanel);
+        myFrame.add(menuBar);
+        myFrame.setJMenuBar(menuBar);
+        
+        // create tool bar
+        final ToolBar toolBar = new ToolBar();
+        
+        // create action and add in tool bar
+        createAction();
+        final Action [] toolActions = {myPencil, myLine, myRectangle, myEllipse};
+        
+        for (final Action action : toolActions) {
+            menuBar.createToolMenuButton(action);
+            toolBar.createToolBarButton(action);
+        }
+        
+        // add components to JFrame
+        myFrame.add(myPanel, BorderLayout.CENTER);
+        myFrame.add(toolBar, BorderLayout.SOUTH);
+        
+        // add image logo 
+        myFrame.setIconImage(new ImageIcon("images/icon.png").getImage());
+        
+        myFrame.setVisible(true);
+        myFrame.pack();
+    }
+    
+    /**
+     * create actions for tool.
+     */
+    private void createAction() {
+        
+        // create Icons
+        final ImageIcon pencilIcon = new ImageIcon("images/pencil.gif");
+        final ImageIcon lineIcon = new ImageIcon("images/line.gif"); 
+        final ImageIcon rectangleIcon = new ImageIcon("images/rectangle.gif"); 
+        final ImageIcon ellipseIcon = new ImageIcon("images/ellipse.gif");
+       
+        
+     
+        // create actions
+        myPencil = new Pencil("Pencil", 
+                                      pencilIcon, "Draw by using a pencil",
+                                      Integer.valueOf(KeyEvent.VK_P));
+        myLine = new Line("Line", lineIcon,
+                                      "Draw by using a line",
+                                       Integer.valueOf(KeyEvent.VK_L));
+        myRectangle = new Rectangle("Rectangle", rectangleIcon, 
+                                         "Draw by using a rectangle", 
+                                                Integer.valueOf(KeyEvent.VK_R));
+        myEllipse = new Ellipse("Ellipse", ellipseIcon, 
+                                         
+                                            "Draw by using an ellipse",                
+                                            Integer.valueOf(KeyEvent.VK_E));
+    }
+    
+    
+    /**
+     * 
+     * @author tvo93
+     * @version 2/12/2016
+     */
+    private class MouseTask extends MouseAdapter { // get idea from canvas
+
+        @Override
+        public void mousePressed(final MouseEvent theEvent) {
+            myPanel.startPoint(theEvent.getPoint());
+        }
+
+        @Override
+        public void mouseDragged(final MouseEvent theEvent) {
+            myPanel.dragPoint(theEvent.getPoint());
+        }
+    }
+   
+   
+   
+
+}

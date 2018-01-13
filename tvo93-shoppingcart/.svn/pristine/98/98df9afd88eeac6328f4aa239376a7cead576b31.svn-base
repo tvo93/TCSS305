@@ -1,0 +1,55 @@
+/*
+ * TCSS 305 Assignment 2 - Shopping Cart
+ */
+
+
+package model;
+
+/**
+ * A class that stores information about a purchase order
+ * for a particular item.
+ * @author tvo93
+ * @version 1/17/2016
+ */
+public final class ItemOrder {
+
+    /** The quantity of an item order. **/
+    private final int myOrderQuantity;
+    
+    /** Item class. **/
+    private final Item myItem;
+    
+    /**
+     * Constructs the Item order and its quantity.
+     * @param theItem the item order
+     * @param theQuantity the quantity of item order
+     */
+    public ItemOrder(final Item theItem, final int theQuantity) {
+        myOrderQuantity = theQuantity;
+        myItem = theItem;     
+    }
+
+
+    /**
+     * Represent the Item in this ItemOrder.
+     * @return a reference to the Item in this ItemOrder
+     */
+    public Item getItem() {     
+        return myItem;
+    }
+    
+    /**
+     * the quantity of item order.
+     * @return  the quantity for this ItemOrder
+     */ 
+    public int getQuantity() {     
+        return myOrderQuantity;
+    }
+
+
+    @Override
+    public String toString() {
+        return myItem.toString();
+    }
+
+}
